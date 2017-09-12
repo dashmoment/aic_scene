@@ -99,11 +99,57 @@ class model_zoo:
         return logits
     
     
-   
+    def vgg16_aic_v1(self):
         
+        model_params = {
+        
+            "conv1_1": [3,3, 64],
+            "conv1_2": [3,3,64],
+            "conv2_1": [3,3,128],
+            "conv2_2": [3,3,128],
+            "conv3_1": [3,3,256],
+            "conv3_2": [3,3,256],
+            "conv3_3": [3,3,256],
+            "conv4_1": [3,3,512],
+            "conv4_2": [3,3,512],
+            "conv4_3": [3,3,512],
+            "conv5_1": [3,3,512],
+            "conv5_2": [3,3,512],
+            "conv5_3": [3,3,512],
+            "fc1": 4096,
+            "fc2": 4096,
+            "fc3": 1000,
+                     
+        }
+        
+        with tf.name_scope("vgg16_aic_v1"):
+            net = nf.convolution_layer(self.inputs, model_params["conv1_1"], [1,1,1,1],name="conv1_1")
+            net = nf.convolution_layer(net, model_params["conv1_2"], [1,1,1,1],name="conv1_2")
+            net = tf.nn.max_pool(net, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME', name='pool1')
+            net = nf.convolution_layer(net, model_params["conv2_1"], [1,1,1,1],name="conv2_1")
+            net = nf.convolution_layer(net, model_params["conv2_2"], [1,1,1,1],name="conv2_2")
+            net = tf.nn.max_pool(net, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME', name='pool2')
+            net = nf.convolution_layer(net, model_params["conv3_1"], [1,1,1,1],name="conv3_1")
+            net = nf.convolution_layer(net, model_params["conv3_2"], [1,1,1,1],name="conv3_2")
+            net = nf.convolution_layer(net, model_params["conv3_3"], [1,1,1,1],name="conv3_3")
+            net = tf.nn.max_pool(net, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME', name='pool3')
+            net = nf.convolution_layer(net, model_params["conv4_1"], [1,1,1,1],name="conv4_1")
+            net = nf.convolution_layer(net, model_params["conv4_2"], [1,1,1,1],name="conv4_2")
+            net = nf.convolution_layer(net, model_params["conv4_3"], [1,1,1,1],name="conv4_3")
+            net = tf.nn.max_pool(net, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME', name='pool4')
+            net = nf.convolution_layer(net, model_params["conv5_1"], [1,1,1,1],name="conv5_1")
+            net = nf.convolution_layer(net, model_params["conv5_2"], [1,1,1,1],name="conv5_2")
+            net = nf.convolution_layer(net, model_params["conv5_3"], [1,1,1,1],name="conv5_3")
+            net = tf.nn.max_pool(net, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME', name='pool5')
+            net = tf.reshape(net, [-1, int(np.prod(net.get_shape()[1:]))])
+            net = nf.fc_layer(net, model_params["fc1"], name="fc1")
+            net = nf.fc_layer(net, model_params["fc2"], name="fc2")
+            logits = nf.fc_layer(net, model_params["fc3"], name="fc3", activat_fn=None)
+
+        return logits
     
     def build_model(self):
-        model_list = ["googleLeNet_v1", "resNet_v1"]
+        model_list = ["googleLeNet_v1", "resNet_v1", "vgg16_aic_v1"]
         
         if self.model_ticket not in model_list:
             print("sorry, wrong ticket!")
@@ -115,14 +161,14 @@ class model_zoo:
             return netowrk
         
         
-def unit_test():
+def unit_test(input_shapes = [None, 32, 32, 3]):
 
-    x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
+    x = tf.placeholder(tf.float32, shape=input_shapes, name='x')
     is_training = tf.placeholder(tf.bool, name='is_training')
     dropout = tf.placeholder(tf.float32, name='dropout')
     
-    mz = model_zoo(x, dropout, is_training,"resNet_v1")
+    mz = model_zoo(x, dropout, is_training,"vgg16_aic_v1")
     return mz.build_model()
     
 
-#m = unit_test()
+m = unit_test([None, 244, 244, 3])
