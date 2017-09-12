@@ -3,12 +3,27 @@ import numpy as np
 import cv2
 import os
 
-data_root = '/home/dashmoment/dataset/ai_challenger_scene/validation'
+#data_root = '/home/dashmoment/dataset/ai_challenger_scene'
+data_root = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/dataset/ai_challenger_scene'
+validation_set = os.path.join(data_root, 'validation')
+training_set = os.path.join(data_root, 'train')
 
-ann_val_path = os.path.join(data_root, 'scene_validation_annotations_20170908.json')
+ann_val_path = os.path.join(validation_set, 'scene_validation_annotations_20170908.json')
+ann_train_path = os.path.join(training_set, 'scene_train_annotations_20170904.json')
 ann_val = pd.read_json(ann_val_path)
+ann_train = pd.read_json(ann_train_path)
 
-img = cv2.imread(os.path.join(data_root, 'images', ann_val['image_id'][0]))
+img = cv2.imread(os.path.join(validation_set, 'images', ann_val['image_id'][0]))
+
+img_means = []
+img_std = []
+
+
+for i in range(1):
+    img = cv2.imread(os.path.join(validation_set, 'image',ann_val['image_id'][i]))
+    
+    img_means.append([img[:,:,0].mean(), img[:,:,1].mean(), img[:,:,2].mean()]) 
+    img_std.append([np.std(img[:,:,0]),np.std(img[:,:,1]), np.std(img[:,:,2])])
 
 corp_ratio = 4.0/5.0
 step = 1.0/5.0
