@@ -3,7 +3,7 @@ import numpy as np
 
 import sys
 sys.path.append('./utility')
-import cifar10
+#import cifar10
 import utility as ut
 
 
@@ -125,107 +125,107 @@ def global_avg_pooling(inputs, flatten="False", name= 'global_avg_pooling'):
     
     
 
-def simple_shortcut_test():
-    
-    cifar10.maybe_download_and_extract()
-        
-    images_test, cls_test, labels_test = cifar10.load_test_data()
-    images_test.astype(np.float32)
-    
-    
-    model_params = {
-            
-            "conv1": [3,3, 64],
-            "conv2": [3,3, 64],
-            "conv3": [3,3,128],
-            "conv4": [3,3, 28],
-            
-            
-            }
-    
-    
-    with tf.variable_scope("test"):
-        
-        x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
-        with tf.variable_scope("test"):
-            
-            x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
-           
-            net1 = convolution_layer(x, model_params["conv1"], [1,1,1,1],name="conv1")
-            net1 = convolution_layer(net1, model_params["conv2"], [1,1,1,1],name="conv2")
-            net2 = convolution_layer(net1, model_params["conv4"], [1,2,2,1],name="conv3")
-            net2 = convolution_layer(net2, model_params["conv3"], [1,1,1,1],name="conv4")
-            
-            net = shortcut(net2, net1, "s1")
-            
-            net_avg = global_avg_pooling(net)
-            
-        
-        
-        
-    with tf.Session() as sess:
-        
-        sess.run(tf.global_variables_initializer())
-        
-        netout = sess.run([net, net_avg],feed_dict={x:images_test[0:5,:,:,:]})
-        
-    return netout
-
-a = simple_shortcut_test()     
-        
-
-def simple_nettest():
-
-    
-    cifar10.maybe_download_and_extract()
-    
-    images_test, cls_test, labels_test = cifar10.load_test_data()
-    images_test.astype(np.float32)
-    
-    
-    model_params = {
-            
-            "conv1": [5,5, 64],
-            "conv2": [3,3,128],
-            "inception_1":{                 
-                    "1x1":64,
-                    "3x3":{ "1x1":96,
-                            "3x3":128
-                            },
-                    "5x5":{ "1x1":16,
-                            "5x5":32
-                            },
-                    "s1x1":32
-                    },
-            "fc3": 128,
-            "fc4": 10
-            
-            }
-    
-    
-    with tf.variable_scope("test"):
-        
-        x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
-       
-        net = convolution_layer(x, model_params["conv1"], [1,2,2,1],name="conv1")
-        net = convolution_layer(net, model_params["conv2"], [1,1,1,1],name="conv2", flatten=False)
-        
-        net = inception_v1(net, model_params, name= "inception_1", flatten=True)
-     
-        net = fc_layer(net, model_params["fc3"], name="fc3")
-        net = fc_layer(net, model_params["fc4"], name="fc4", activat_fn=None)
-        
-        
-    
-    with tf.Session() as sess:
-        
-        sess.run(tf.global_variables_initializer())
-        
-        
-        netout = sess.run(net, feed_dict={x:images_test[0:5,:,:,:]})
-        ut.print_operations_in_graph()
-        
-    return netout
+#def simple_shortcut_test():
+#    
+#    cifar10.maybe_download_and_extract()
+#        
+#    images_test, cls_test, labels_test = cifar10.load_test_data()
+#    images_test.astype(np.float32)
+#    
+#    
+#    model_params = {
+#            
+#            "conv1": [3,3, 64],
+#            "conv2": [3,3, 64],
+#            "conv3": [3,3,128],
+#            "conv4": [3,3, 28],
+#            
+#            
+#            }
+#    
+#    
+#    with tf.variable_scope("test"):
+#        
+#        x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
+#        with tf.variable_scope("test"):
+#            
+#            x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
+#           
+#            net1 = convolution_layer(x, model_params["conv1"], [1,1,1,1],name="conv1")
+#            net1 = convolution_layer(net1, model_params["conv2"], [1,1,1,1],name="conv2")
+#            net2 = convolution_layer(net1, model_params["conv4"], [1,2,2,1],name="conv3")
+#            net2 = convolution_layer(net2, model_params["conv3"], [1,1,1,1],name="conv4")
+#            
+#            net = shortcut(net2, net1, "s1")
+#            
+#            net_avg = global_avg_pooling(net)
+#            
+#        
+#        
+#        
+#    with tf.Session() as sess:
+#        
+#        sess.run(tf.global_variables_initializer())
+#        
+#        netout = sess.run([net, net_avg],feed_dict={x:images_test[0:5,:,:,:]})
+#        
+#    return netout
+#
+#a = simple_shortcut_test()     
+#        
+#
+#def simple_nettest():
+#
+#    
+#    cifar10.maybe_download_and_extract()
+#    
+#    images_test, cls_test, labels_test = cifar10.load_test_data()
+#    images_test.astype(np.float32)
+#    
+#    
+#    model_params = {
+#            
+#            "conv1": [5,5, 64],
+#            "conv2": [3,3,128],
+#            "inception_1":{                 
+#                    "1x1":64,
+#                    "3x3":{ "1x1":96,
+#                            "3x3":128
+#                            },
+#                    "5x5":{ "1x1":16,
+#                            "5x5":32
+#                            },
+#                    "s1x1":32
+#                    },
+#            "fc3": 128,
+#            "fc4": 10
+#            
+#            }
+#    
+#    
+#    with tf.variable_scope("test"):
+#        
+#        x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name='x')
+#       
+#        net = convolution_layer(x, model_params["conv1"], [1,2,2,1],name="conv1")
+#        net = convolution_layer(net, model_params["conv2"], [1,1,1,1],name="conv2", flatten=False)
+#        
+#        net = inception_v1(net, model_params, name= "inception_1", flatten=True)
+#     
+#        net = fc_layer(net, model_params["fc3"], name="fc3")
+#        net = fc_layer(net, model_params["fc4"], name="fc4", activat_fn=None)
+#        
+#        
+#    
+#    with tf.Session() as sess:
+#        
+#        sess.run(tf.global_variables_initializer())
+#        
+#        
+#        netout = sess.run(net, feed_dict={x:images_test[0:5,:,:,:]})
+#        ut.print_operations_in_graph()
+#        
+#    return netout
 
 
 

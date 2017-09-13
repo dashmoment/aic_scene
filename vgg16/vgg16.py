@@ -11,9 +11,6 @@
 import tensorflow as tf
 import numpy as np
 from scipy.misc import imread, imresize
-import sys
-sys.path.append('./vgg16')
-
 from imagenet_classes import class_names
 
 
@@ -252,15 +249,13 @@ class vgg16:
         weights = np.load(weight_file)
         keys = sorted(weights.keys())
         for i, k in enumerate(keys):
-            print (i, k, np.shape(weights[k]))
+            print(i, k, np.shape(weights[k]))
             sess.run(self.parameters[i].assign(weights[k]))
 
-#model_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/pretrained_model/vgg16_weights.npz'
-model_path = '/home/dashmoment/dataset/vgg16_weights.npz'
 if __name__ == '__main__':
     sess = tf.Session()
     imgs = tf.placeholder(tf.float32, [None, 224, 224, 3])
-    vgg = vgg16(imgs, model_path , sess)
+    vgg = vgg16(imgs, '/home/dashmoment/dataset/vgg16_weights.npz', sess)
 
     img1 = imread('laska.png', mode='RGB')
     img1 = imresize(img1, (224, 224))

@@ -171,4 +171,4 @@ def unit_test(input_shapes = [None, 32, 32, 3]):
     return mz.build_model()
     
 
-m = unit_test([None, 244, 244, 3])
+#m = unit_test([None, 244, 244, 3])
