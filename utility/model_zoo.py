@@ -119,6 +119,7 @@ class model_zoo:
             "fc1": 4096,
             "fc2": 4096,
             "fc3": 1000,
+            "fc3_aic": 80
                      
         }
         
@@ -142,9 +143,14 @@ class model_zoo:
             net = nf.convolution_layer(net, model_params["conv5_3"], [1,1,1,1],name="conv5_3")
             net = tf.nn.max_pool(net, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME', name='pool5')
             net = tf.reshape(net, [-1, int(np.prod(net.get_shape()[1:]))])
+            
             net = nf.fc_layer(net, model_params["fc1"], name="fc1")
-            net = nf.fc_layer(net, model_params["fc2"], name="fc2")
-            logits = nf.fc_layer(net, model_params["fc3"], name="fc3", activat_fn=None)
+            net = nf.fc_layer(net, model_params["fc2"], name="fc2")        
+            net_ori = nf.fc_layer(net, model_params["fc3"], name="fc3", activat_fn=None)
+            
+            
+            logits = nf.fc_layer(net, model_params["fc3_aic"], name="fc3_aic", activat_fn=None)
+            
 
         return logits
     

@@ -2,63 +2,122 @@ import pandas as pd
 import numpy as np
 import cv2
 import os
+import random
 
-#data_root = '/home/dashmoment/dataset/ai_challenger_scene'
-data_root = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/dataset/ai_challenger_scene'
-validation_set = os.path.join(data_root, 'validation')
-training_set = os.path.join(data_root, 'train')
-
-ann_val_path = os.path.join(validation_set, 'scene_validation_annotations_20170908.json')
-ann_train_path = os.path.join(training_set, 'scene_train_annotations_20170904.json')
-ann_val = pd.read_json(ann_val_path)
-ann_train = pd.read_json(ann_train_path)
-
-img = cv2.imread(os.path.join(validation_set, 'images', ann_val['image_id'][0]))
-
-img_means = []
-img_std = []
-
-
-for i in range(1):
-    img = cv2.imread(os.path.join(validation_set, 'image',ann_val['image_id'][i]))
+def calculate_data_attribute(data_sets, data_set_files, file_path = None):
     
-    img_means.append([img[:,:,0].mean(), img[:,:,1].mean(), img[:,:,2].mean()]) 
-    img_std.append([np.std(img[:,:,0]),np.std(img[:,:,1]), np.std(img[:,:,2])])
-
-corp_ratio = 4.0/5.0
-step = 1.0/5.0
-
-x_step = int(img.shape[0]*step) -1
-y_step = int(img.shape[1]*step) - 1
-
-x_init = 0
-x_end = int(img.shape[0]*corp_ratio)
-
-img = cv2.flip(img,1)
-
-while x_end < img.shape[0]:
+    img_means = []
+    total_pixel = []
+    axis0_size = 0
+    axis1_size = 0
     
-    y_init = 0
-    y_end = int(img.shape[1]*corp_ratio)
+    total_Nfile = 0
     
-    while y_end < img.shape[1]:
+    for dset, ann in zip(data_sets, data_set_files):  
         
+        for i in range(len(ann)):
+            
+            total_Nfile = total_Nfile + 1
+            
+            print("DataSet: {}, progress:{}/{}".format(dset, i, len(ann)))
+            
+            
+            img = cv2.imread(os.path.join(dset, 'images',ann['image_id'][i]))
+            
+            img_means.append([img[:,:,0].sum(), img[:,:,1].sum(), img[:,:,2].sum()]) 
+            total_pixel.append(img.shape[0]*img.shape[1])
+            axis0_size = axis0_size + img.shape[0]
+            axis1_size = axis1_size + img.shape[1]
+    
+    img_means = np.vstack(img_means)
+    total_pixel = np.sum(total_pixel)
+    means = np.sum(img_means,axis=0)/total_pixel
+    
+    avg_axis0 = axis0_size/total_Nfile
+    avg_axis1 = axis1_size/total_Nfile
+    
+    attributes = {
+            "Nfiles":total_Nfile,
+            "avg_axis0":avg_axis0,
+            "avg_axis1":avg_axis1,
+            "avg_mean":means,
+    
+            }
+
+    if file_path != None:
         
-        print(x_init, x_end,y_init, y_end)
-        y_init = y_init + y_step
-        y_end = y_end + y_step
+        df = pd.DataFrame(attributes)
+        df.to_csv(file_path, index=False)
+
+    return attributes
+
+#data_sets = [training_set]
+#data_set_files = [ann_train]
+#file_path =  os.path.join(data_root,'attributes.csv')
+#d_attr = calculate_data_attribute(data_sets, data_set_files,file_path)
+
+def random_crop(img, corp_ratio = 0.8, step = 0.2):
+
+    portions = []
+    init_point = 0
+    
+    
+    while init_point < 1- corp_ratio + 0.1*step:
         
-    x_init = x_init + x_step
-    x_end = x_end + x_step
+        portions.append(init_point)
+        
+        init_point = init_point + step
+    
+    
+    random.shuffle(portions) 
+    x_init = int(portions[0]*img.shape[0])
+    x_end= int(x_init + corp_ratio*img.shape[0])
+    random.shuffle(portions) 
+    y_init = int(portions[0]*img.shape[1])
+    y_end = int(y_init + corp_ratio*img.shape[1])
+    
+    crop_img = img[x_init:x_end,y_init:y_end,:]
+    
+    return crop_img
+
+def random_flip(img):
+    
+    flip_code = [0,1,2]
+    random.shuffle(flip_code) 
+     
+    if flip_code[0] != 2:
+        flip_img = cv2.flip(img, flip_code[0])
+    
+    else:
+        flip_img = img
+    
+    return flip_img
 
 
-center_corp = img[img.shape[0]//2 -int(img.shape[0]*corp_ratio)//2: img.shape[0]//2 +int(img.shape[0]*corp_ratio)//2, img.shape[1]//2 -int(img.shape[1]*corp_ratio)//2: img.shape[1]//2 +int(img.shape[1]*corp_ratio)//2]
-cv2.imshow('origin', img)
-cv2.imshow('cen', center_corp)
 
-cv2.waitKey()
+def get_batch(data_root, ann_file, batch_size, index_list, step ,image_size=(224,224), isflip = True):
 
-#for i in range(0,img.shape[0], img.shape[0]//step):
-#    for j in range(0,img.shape[1], img.shape[1]//step):
-#        print(i,j)
-
+    batch_img = []
+    batch_label = []
+    
+    for idx in range(step*batch_size,step*batch_size + batch_size):
+        
+        i = index_list[idx]
+        img = cv2.imread(os.path.join(data_root, 'images',ann_file['image_id'][i]))
+        
+        if img == None:
+            print("No such file ", os.path.join(data_root, 'images',ann_file['image_id'][i]))
+            return
+        
+        label = ann_file['label_id'][i]
+        tmp_img = random_crop(img)
+        if isflip == True: tmp_img = random_flip(tmp_img)   
+        tmp_img = cv2.resize(tmp_img, image_size)
+        
+        batch_img.append(tmp_img)
+        batch_label.append(label)
+        
+    batch_img = np.stack(batch_img)
+    
+    return batch_img, batch_label
+    
