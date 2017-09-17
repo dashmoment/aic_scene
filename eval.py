@@ -1,69 +1,43 @@
 import tensorflow as tf
-import numpy as np
 
 import sys
 sys.path.append('./utility')
-import cifar10
-import utility as ut
-from sklearn.metrics import confusion_matrix
+import data_utility
+import config
+import data_utility as du
 
-NUM_CLASSES = 10
-cifar10.maybe_download_and_extract()
+conf = config.config('home')
+data_u = du.data_utility("home")
 
+   
+tp = 0
+batch_size = 200
 
-images_test, cls_test, labels_test = cifar10.load_test_data()
-
-images_test = images_test.astype(np.float32)
-labels_test = labels_test.astype(np.int64)
-
-flags = tf.app.flags
-
-flags.DEFINE_string('model_path', './model', 'Directory for saving model')
-flags.DEFINE_string('meta_file', 'model/test.ckpt-1500.meta', 'Graph metafile')
-
-
-FLAGS = flags.FLAGS
-
-
-def main(argv):
-    
-    tp = 0
-    batch_size = 200
-
-    with tf.Session() as sess:
+with tf.Session() as sess:
         
     
-        saver = tf.train.import_meta_graph(FLAGS.meta_file)
-        saver.restore(sess, tf.train.latest_checkpoint(FLAGS.model_path))
+    saver = tf.train.import_meta_graph(conf.meta_file)
+    saver.restore(sess, tf.train.latest_checkpoint(conf.checkpoint_path))
         
-        graph = tf.get_default_graph()
+    graph = tf.get_default_graph()
        
-    #    for op in  graph.get_operations(): print(op.name)
-       
-     
-        x = graph.get_tensor_by_name("x:0")
-        is_training = graph.get_tensor_by_name("is_training:0")
-        dropout = graph.get_tensor_by_name("dropout:0")
-        logits = graph.get_tensor_by_name("train/resNet_v1/logits/logits:0")
-    
+    for op in  graph.get_operations(): print(op.name)
+
+    imgs = graph.get_tensor_by_name("plcaholders/images_1:0")
+    predict = graph.get_tensor_by_name("vgg16/Softmax:0")
+    accurate = tf.reduce_sum(tf.cast(tf.equal(tf.arg_max(predict,1), conf.label), tf.int64))
+
+    for i in range(len(conf.validation_idx_list)//batch_size):
+
+        print("Iteration:{}/{}".format(i,len(conf.validation_idx_list)))
         
-        for i in range(len(images_test)//batch_size):
-            
-            inputs = images_test[i*batch_size:i*batch_size+batch_size,:,:,:]
-            labels = labels_test[i*batch_size:i*batch_size+batch_size,:]
-              
-            
-            predict_model = tf.argmax(tf.nn.softmax(logits),1)
-            true_label = tf.argmax(labels,1)   
-            true_positive = sess.run(ut.clac_accuracy(logits,labels), feed_dict={x:inputs,dropout:1,is_training:False})
-            
-            tp = tp + true_positive
-            
-            print("Iteration:{}, Accuracy:{} ".format(i,tp/(i*batch_size+1)))
+        test_batch = data_u.get_batch('validation', conf.validation_idx_list, i)
+        feed_dict = {imgs:test_batch[0],conf.label:test_batch[1], conf.learning_rate:1e-4, conf.is_training:False, conf.dropout:1}
+        acc_num= sess.run(accurate, feed_dict = feed_dict)
         
+        tp = tp + acc_num
+
+    print("Accuracy: ", tp/len(conf.validation_idx_list))
 
 
-if __name__== '__main__':
-    tf.app.run()
-        
 
