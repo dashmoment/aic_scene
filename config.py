@@ -49,9 +49,14 @@ class config:
 		self.batch_size = 16
 		self.data_root = '/home/dashmoment/dataset/ai_challenger_scene'
 		self.checkpoint_path = '../aic_log/model'
-		self.meta_file = os.path.join(self.checkpoint_path, 'model.ckpt-0.meta')
+		self.meta_file = os.path.join(self.checkpoint_path, 'model.ckpt-54079.meta')
 		self.summary_path = '../aic_log/log'
 		self.pretrained_weight_path = '/home/dashmoment/dataset/vgg16_weights.npz'
+		self.pretrained_resnet_path = '/home/dashmoment/dataset/pretrained/resnet-pretrained'
+		self.pretrained_resnet50_meta = os.path.join(self.pretrained_resnet_path, 'ResNet-L50.meta')
+		self.pretrained_resnet152_meta = os.path.join(self.pretrained_resnet_path, 'ResNet-L152.meta')
+		self.pretrained_resnet50_ckpt = os.path.join(self.pretrained_resnet_path, 'ResNet-L50.ckpt')
+		self.pretrained_resnet152_ckpt = os.path.join(self.pretrained_resnet_path, 'ResNet-L152.ckpt')
 
 	def office(self):
 		self.batch_size = 32
