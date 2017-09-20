@@ -6,12 +6,11 @@ import data_utility
 import config
 import data_utility as du
 
-conf = config.config('home')
-data_u = du.data_utility("home")
+conf = config.config('office')
+data_u = du.data_utility("office")
 
    
 tp = 0
-batch_size = 200
 
 with tf.Session() as sess:
         
@@ -27,7 +26,7 @@ with tf.Session() as sess:
     predict = graph.get_tensor_by_name("vgg16/Softmax:0")
     accurate = tf.reduce_sum(tf.cast(tf.equal(tf.arg_max(predict,1), conf.label), tf.int64))
 
-    for i in range(len(conf.validation_idx_list)//batch_size):
+    for i in range(len(conf.validation_idx_list)//conf.batch_size):
 
         print("Iteration:{}/{}".format(i,len(conf.validation_idx_list)))
         

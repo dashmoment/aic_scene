@@ -14,8 +14,8 @@ import log_utility as log_u
 import config
 
 
-conf = config.config("home")
-data_u = du.data_utility("home")
+conf = config.config("office")
+data_u = du.data_utility("office")
 
 with tf.name_scope('preprocess') as scope:
     mean = tf.constant([114.156, 121.907, 126.488], dtype=tf.float32, shape=[1, 1, 1, 3], name='img_mean')
@@ -45,8 +45,8 @@ with tf.Session() as sess:
 	test_log = log.build_logger("test",log_collection)
 
 	restore = log.restore_model()
-	if restore != True:
-		restore_pretrain.vgg16_imagenet()
+	#if restore != True:
+		#restore_pretrain.vgg16_imagenet()
 
 
 	for epoch in range(conf.Nepoch):
@@ -63,7 +63,7 @@ with tf.Session() as sess:
 
 			sess.run(train_op, feed_dict = feed_dict)
 
-			iterations = step + len(conf.train_idx_list)*epoch
+			iterations = step + epoch*len(conf.train_idx_list)//conf.batch_size
 
 			if step % conf.train_log_step == 0:
 				loss_out, acc,train_sum = sess.run([loss, true_positive, train_log], feed_dict = feed_dict)
