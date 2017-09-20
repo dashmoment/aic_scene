@@ -6,7 +6,7 @@ class config:
 
 	def __init__(self, config):
 
-		self.batch_size = 32
+		self.batch_size = 1
 		self.test_batch_size = 1
 		self.Nepoch = 100000
 		self.train_log_step = 200
@@ -53,6 +53,12 @@ class config:
 		self.meta_file = os.path.join(self.checkpoint_path, 'model.ckpt-0.meta')
 		self.summary_path = '../aic_log/log'
 		self.pretrained_weight_path = '/home/dashmoment/dataset/vgg16_weights.npz'
+		self.pretrained_resnet_path = '/home/dashmoment/dataset/pretrained/resnet-pretrained'
+		self.pretrained_resnet50_meta = os.path.join(self.pretrained_resnet_path, 'ResNet-L50.meta')
+		self.pretrained_resnet152_meta = os.path.join(self.pretrained_resnet_path, 'ResNet-L152.meta')
+		self.pretrained_resnet50_ckpt = os.path.join(self.pretrained_resnet_path, 'ResNet-L50.ckpt')
+		self.pretrained_resnet152_ckpt = os.path.join(self.pretrained_resnet_path, 'ResNet-L152.ckpt')
+
 
 	def office(self):
 		self.batch_size = 32
