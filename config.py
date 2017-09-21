@@ -63,7 +63,13 @@ class config:
 	def office(self):
 		self.batch_size = 32
 		self.data_root = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/dataset/ai_challenger_scene'
-		self.checkpoint_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/model/aic_scene/model'
+		self.checkpoint_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/model/aic_scene/res_pretrain/model'
 		self.meta_file = os.path.join(self.checkpoint_path, 'model.ckpt-2426155.meta')
-		self.summary_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/model/aic_scene/vgg16_npretrain/log'
+		self.summary_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/model/aic_scene/res_pretrain/log'
 		self.pretrained_weight_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/pretrained_model/vgg16_weights.npz'
+
+		self.pretrained_resnet_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/pretrained_model/resnet-pretrained'
+		self.pretrained_resnet50_meta = os.path.join(self.pretrained_resnet_path, 'ResNet-L50.meta')
+		self.pretrained_resnet152_meta = os.path.join(self.pretrained_resnet_path, 'ResNet-L152.meta')
+		self.pretrained_resnet50_ckpt = os.path.join(self.pretrained_resnet_path, 'ResNet-L50.ckpt')
+		self.pretrained_resnet152_ckpt = os.path.join(self.pretrained_resnet_path, 'ResNet-L152.ckpt')
