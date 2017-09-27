@@ -4,6 +4,7 @@ import cv2
 import os
 import random
 import config
+from keras.utils import np_utils
 
 
 class data_utility: 
@@ -167,6 +168,65 @@ class data_utility:
         return batch_img, batch_label
 
 
+    def get_batch_onehot(self, btype, index_list,step , isflip = True):
+
+            batch_img = []
+            batch_label = []
+
+            
+            if btype == 'train':
+                batch_size = self.conf.batch_size
+                ann_file = self.conf.ann_train
+                data_root = self.conf.training_set
+                
+
+            elif btype == 'validation':
+                batch_size = self.conf.test_batch_size
+                ann_file = self.conf.ann_val
+                data_root = self.conf.validation_set
+               
+
+            elif btype == 'test':
+                batch_size = self.conf.test_batch_size
+                ann_file = self.conf.ann_test
+                data_root = self.conf.test_set
+                
+
+            else:
+
+                print("Error: Batch type shall be 'train', 'validation', or 'test'")
+                return
+
+
+            for idx in range(step*batch_size,step*batch_size + batch_size):
+                
+                i = index_list[idx]
+
+                img = cv2.imread(os.path.join(data_root, 'images',ann_file['image_id'][i]))
+                
+                if img == None:
+                    print("No such file ", os.path.join(data_root, 'images',ann_file['image_id'][i]))
+                    return
+                
+
+                label = ann_file['label_id'][i]
+
+                if btype == 'train':
+                    tmp_img = self.random_crop(img)
+                    if isflip == True: tmp_img = self.random_flip(tmp_img)   
+                else:
+                    tmp_img = img
+
+                tmp_img = cv2.resize(tmp_img, (self.conf.img_size, self.conf.img_size))
+               
+
+                batch_img.append(tmp_img)
+                batch_label.append(np_utils.to_categorical(label, 80))
+                
+            batch_img = np.stack(batch_img)
+            batch_label = np.vstack(batch_label)
+            
+            return batch_img, batch_label
 
 
 
