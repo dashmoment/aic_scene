@@ -18,8 +18,8 @@ sys.path.append("utility")
 import data_utility as du
 import config 
 
-conf = config.config("office")
-data_u = du.data_utility("office")
+conf = config.config("home")
+data_u = du.data_utility("home")
 
 
 sys.setrecursionlimit(3000)
@@ -177,7 +177,7 @@ def resnet152_model(img_rows, img_cols, color_type=1, num_classes=None):
       weights_path = 'imagenet_models/resnet152_weights_th.h5'
     else:
       # Use pre-trained weights for Tensorflow backend
-      weights_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/pretrained_model/resnet152_weights_tf.h5'
+      weights_path = '/home/dashmoment/model/resnet152_weights_tf.h5'
 
     model.load_weights(weights_path, by_name=True)
 
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     # Load Cifar10 data. Please implement your own load_data() module for your own dataset
     #X_train, Y_train, X_valid, Y_valid = load_cifar10_data(img_rows, img_cols)
 
-    # Load our model
+    print("Load model")
     model = resnet152_model(img_rows, img_cols, channel, num_classes)
 
     # Start Fine-tuning
