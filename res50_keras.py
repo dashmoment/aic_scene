@@ -199,9 +199,10 @@ if __name__ == '__main__':
     # Load Cifar10 data. Please implement your own load_data() module for your own dataset
 #    X_train, Y_train, X_valid, Y_valid = load_cifar10_data(img_rows, img_cols)
     
-    tbCallBack = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
+    tbCallBack = keras.callbacks.TensorBoard(log_dir='../../aic_scene/logs', histogram_freq=1, write_graph=True, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
     # Load our model
     model = resnet50_model(img_rows, img_cols, channel, num_classes)
+    model.save('../../aic_scene/model')
     train_data_gen = data_gen('train')
     val_data_gen = data_gen('validation')
     model.fit_generator(train_data_gen,
