@@ -47,7 +47,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     x = Conv2D(nb_filter3,(1, 1), name=conv_name_base + '2c')(x)
     x = BatchNormalization(axis=bn_axis, name=bn_name_base + '2c')(x)
 
-    x = add([x, input_tensor], mode='sum')
+    x = merge([x, input_tensor], mode='sum')
     x = Activation('relu')(x)
     return x
 
@@ -100,7 +100,7 @@ def data_gen(data_type):
         for step in range(len(idx_list)//conf.batch_size):
             
             yield data_u.get_batch_onehot(data_type, idx_list,step)
-
+            
 def resnet50_model(img_rows, img_cols, color_type=1, num_classes=None):
     """
     Resnet 50 Model for Keras
@@ -166,7 +166,7 @@ def resnet50_model(img_rows, img_cols, color_type=1, num_classes=None):
       weights_path = 'imagenet_models/resnet50_weights_th_dim_ordering_th_kernels.h5'
     else:
       # Use pre-trained weights for Tensorflow backend
-      weights_path = '/home/dashmoment/model/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
+      weights_path = '/home/dashmoment/model/pretrained/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
 
     model.load_weights(weights_path)
 
@@ -199,10 +199,10 @@ if __name__ == '__main__':
     # Load Cifar10 data. Please implement your own load_data() module for your own dataset
 #    X_train, Y_train, X_valid, Y_valid = load_cifar10_data(img_rows, img_cols)
     
-    tbCallBack = keras.callbacks.TensorBoard(log_dir='../../aic_scene/logs', histogram_freq=1, write_graph=True, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
+    tbCallBack = keras.callbacks.TensorBoard(log_dir='/home/dashmoment/model/aic_scene/logs', histogram_freq=1, write_graph=True, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
     # Load our model
     model = resnet50_model(img_rows, img_cols, channel, num_classes)
-    model.save('../../aic_scene/model')
+    model.save('/home/dashmoment/model/aic_scene/res50.h5')
     train_data_gen = data_gen('train')
     val_data_gen = data_gen('validation')
     model.fit_generator(train_data_gen,

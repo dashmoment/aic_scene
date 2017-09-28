@@ -6,7 +6,6 @@ import numpy as np
 import os 
 import sys
 sys.path.append('./utility')
-import cifar10
 import utility as ut
 
 import help_function as h

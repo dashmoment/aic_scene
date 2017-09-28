@@ -106,7 +106,7 @@ class data_utility:
 
 
 
-    def get_batch(self, btype, index_list,step , isflip = True):
+    def get_batch(self, btype, index_list,step , isflip = True, randpm = True):
 
         batch_img = []
         batch_label = []
@@ -137,6 +137,9 @@ class data_utility:
             print("Error: Batch type shall be 'train', 'validation', or 'test'")
             return
 
+        if step == 0 and random == True:
+             random.shuffle(index_list) 
+             print("Random shuffle")
 
         for idx in range(step*batch_size,step*batch_size + batch_size):
             
@@ -152,6 +155,7 @@ class data_utility:
             label = ann_file['label_id'][i]
 
             if btype == 'train':
+
                 tmp_img = self.random_crop(img)
                 if isflip == True: tmp_img = self.random_flip(tmp_img)   
             else:
@@ -204,7 +208,7 @@ class data_utility:
 
                 img = cv2.imread(os.path.join(data_root, 'images',ann_file['image_id'][i]))
                 
-                if img == None:
+                if img is None:
                     print("No such file ", os.path.join(data_root, 'images',ann_file['image_id'][i]))
                     return
                 
@@ -225,6 +229,8 @@ class data_utility:
                 
             batch_img = np.stack(batch_img)
             batch_label = np.vstack(batch_label)
+
+            print(batch_label)
             
             return batch_img, batch_label
 
