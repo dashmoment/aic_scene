@@ -18,8 +18,8 @@ sys.path.append("utility")
 import data_utility as du
 import config 
 
-conf = config.config("home")
-data_u = du.data_utility("home")
+conf = config.config("office")
+data_u = du.data_utility("office")
 
 def set_keras_backend(backend):
 

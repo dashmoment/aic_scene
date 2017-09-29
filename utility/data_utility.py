@@ -230,7 +230,6 @@ class data_utility:
             batch_img = np.stack(batch_img)
             batch_label = np.vstack(batch_label)
 
-            print(batch_label)
             
             return batch_img, batch_label
 

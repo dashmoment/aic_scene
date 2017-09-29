@@ -17,8 +17,8 @@ sys.path.append("utility")
 import data_utility as du
 import config 
 
-conf = config.config("home")
-data_u = du.data_utility("home")
+conf = config.config("office")
+data_u = du.data_utility("office")
 
 def identity_block(input_tensor, kernel_size, filters, stage, block):
     """
@@ -166,7 +166,8 @@ def resnet50_model(img_rows, img_cols, color_type=1, num_classes=None):
       weights_path = 'imagenet_models/resnet50_weights_th_dim_ordering_th_kernels.h5'
     else:
       # Use pre-trained weights for Tensorflow backend
-      weights_path = '/home/dashmoment/model/pretrained/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
+      #weights_path = '/home/dashmoment/model/pretrained/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
+      weights_path = '/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/pretrained_model/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
 
     model.load_weights(weights_path)
 
@@ -199,15 +200,15 @@ if __name__ == '__main__':
     # Load Cifar10 data. Please implement your own load_data() module for your own dataset
 #    X_train, Y_train, X_valid, Y_valid = load_cifar10_data(img_rows, img_cols)
     
-    tbCallBack = keras.callbacks.TensorBoard(log_dir='/home/dashmoment/model/aic_scene/logs', histogram_freq=1, write_graph=True, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
+    tbCallBack = keras.callbacks.TensorBoard(log_dir='/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/model/aic_scene/res50_v1/logs', histogram_freq=1, write_graph=True, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
     # Load our model
     model = resnet50_model(img_rows, img_cols, channel, num_classes)
-    model.save('/home/dashmoment/model/aic_scene/res50.h5')
+    model.save('/media/ubuntu/65db2e03-ffde-4f3d-8f33-55d73836211a/model/aic_scene/res50_v1/res50.h5')
     train_data_gen = data_gen('train')
     val_data_gen = data_gen('validation')
     model.fit_generator(train_data_gen,
               steps_per_epoch= len(conf.train_idx_list)//conf.batch_size,
-              epochs= 10,
+              epochs= 500,
               verbose=1,
               validation_data = val_data_gen,
               validation_steps = 500,
