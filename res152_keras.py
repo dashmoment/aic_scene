@@ -13,13 +13,22 @@ from custom_layers.scale_layer import Scale
 
 
 import sys
-
+import os
 sys.path.append("utility")
 import data_utility as du
 import config 
 
 conf = config.config("office")
 data_u = du.data_utility("office")
+
+def set_keras_backend(backend):
+
+    if K.backend() != backend:
+        os.environ['KERAS_BACKEND'] = backend
+        reload(K)
+        assert K.backend() == backend
+
+set_keras_backend("tensorflow")
 
 
 sys.setrecursionlimit(3000)
