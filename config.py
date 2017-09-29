@@ -47,7 +47,7 @@ class config:
 
 	def home(self):
 
-		self.batch_size = 16
+		self.batch_size = 8
 		self.data_root = '/home/dashmoment/dataset/ai_challenger_scene'
 		self.checkpoint_path = '../aic_log/model'
 		self.meta_file = os.path.join(self.checkpoint_path, 'model.ckpt-0.meta')
